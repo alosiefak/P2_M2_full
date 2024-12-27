@@ -1,0 +1,97 @@
+openapi: 3.1.0
+info:
+  title: Environment Management API
+  version: 1.0.0
+
+paths:
+  /:
+    get:
+      summary: Root endpoint
+      responses:
+        '200':
+          description: Welcome message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /healthz:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Health check response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+
+  /environments:
+    get:
+      summary: List environments
+      responses:
+        '200':
+          description: List of environments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Environment'
+    post:
+      summary: Create environment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '202':
+          description: Environment creation accepted
+        '409':
+          description: Environment already exists
+
+  /environments/{name}:
+    delete:
+      summary: Delete environment
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Environment deletion accepted
+
+components:
+  schemas:
+    Environment:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [CREATING, ACTIVE, MARKED, DELETING, ERROR]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - name
+        - status
+        - createdAt
